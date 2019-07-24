@@ -1,0 +1,32 @@
+{
+  "name": "vue-lazybee",
+  "version": "1.0.0",
+  "description": "Vue plugins to help you quickly build applications",
+  "main": "dist/index.cjs.js",
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lazipy/vue-lazybee.git"
+  },
+  "keywords": [
+    "vue",
+    "lazybee"
+  ],
+  "author": "lazipy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lazipy/vue-lazybee/issues"
+  },
+  "homepage": "https://github.com/lazipy/vue-lazybee#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.7.0",
+    "rollup": "^1.17.0",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-uglify-es": "^0.0.1"
+  }
+}
