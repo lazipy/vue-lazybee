@@ -4,8 +4,8 @@
  * 3、当前语言缓存cookie
  * 4、data中的多语言支持响应式改变
  */
-import Vuei18n from 'vue-i18n'
-import Cookies from 'js-cookie'
+import Vuei18n from '../vendors/vue-i18n'
+import Cookies from '../vendors/js-cookie'
 
 let messages = {}
 

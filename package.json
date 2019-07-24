@@ -1,6 +1,6 @@
 {
   "name": "vue-lazybee",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Vue plugins to help you quickly build applications",
   "main": "dist/index.cjs.js",
   "scripts": {
@@ -28,5 +28,8 @@
     "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-uglify-es": "^0.0.1"
+  },
+  "dependencies": {
+    "js-cookie": "^2.2.0"
   }
 }

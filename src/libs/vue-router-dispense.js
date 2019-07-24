@@ -1,4 +1,4 @@
-import Router from 'vue-router'
+import Router from '../vendors/vue-router'
 
 let routes = []
 // 获取所有模块的router.js
