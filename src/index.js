@@ -1,6 +1,7 @@
 import Router from './libs/vue-router-dispense'
 import AutoVuex from './libs/auto-vuex'
 import VueI18nStorge from './libs/vue-i18n-storge'
+import CreateService from './libs/axios-json'
 import options from '@/.lazybee'
 
 let defaultOptions = {
@@ -13,6 +14,8 @@ let defaultOptions = {
 }
 
 const params = Object.assign(defaultOptions, options)
+
+export const server = new CreateService(params.httpConfig)
 
 export default {
   install (Vue) {
