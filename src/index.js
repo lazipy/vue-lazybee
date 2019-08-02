@@ -2,7 +2,7 @@ import Router from './libs/vue-router-dispense'
 import AutoVuex from './libs/auto-vuex'
 import VueI18nStorge from './libs/vue-i18n-storge'
 import CreateService from './libs/axios-json'
-import options from '@/.lazybee'
+import options from '@/config.js'
 
 let defaultOptions = {
   mode: 'history',
@@ -15,7 +15,7 @@ let defaultOptions = {
 
 const params = Object.assign(defaultOptions, options)
 
-export const server = new CreateService(params.httpConfig)
+export const request = new CreateService(params.httpConfig)
 
 export default {
   install (Vue) {
@@ -31,14 +31,15 @@ export default {
       breadcrumb: params.breadcrumb,
       scrollBehavior: params.scrollBehavior,
       routes: params.routes,
-      modules: require.context('@/views', true, /router\.js/),
+      modules: require.context('@/pages', true, /router\.js/),
       filter: params.filter,
       beforeEach: params.beforeEach,
       afterEach: params.afterEach
     })
 
     let store = new AutoVuex({
-      files: require.context('@/store', true, /\.js$/)
+      files: require.context('@/models', true, /\.js$/),
+      pages: require.context('@/pages', true, /model\.js$/)
     })
 
     let i18n = new VueI18nStorge({

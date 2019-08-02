@@ -1,4 +1,4 @@
-define(['exports', 'vuex', '@/.lazybee'], function (exports, Vuex, options) { 'use strict';
+define(['exports', 'vuex', '@/config.js'], function (exports, Vuex, options) { 'use strict';
 
   Vuex = Vuex && Vuex.hasOwnProperty('default') ? Vuex['default'] : Vuex;
   options = options && options.hasOwnProperty('default') ? options['default'] : options;
@@ -2512,6 +2512,7 @@ define(['exports', 'vuex', '@/.lazybee'], function (exports, Vuex, options) { 'u
   }
 
   let routes = [];
+  let isGet = false;
   // 获取所有模块的router.js
   function getRoutes(modules) {
     if (modules) {
@@ -2545,11 +2546,11 @@ define(['exports', 'vuex', '@/.lazybee'], function (exports, Vuex, options) { 'u
 
   // 添加面包屑信息
   function addBreadcrumb(routes, router) {
-    routes = [...routes, router.options.routes];
+    routes = [...routes, ...router.options.routes];
     const indexRoute = getIndexRoute(routes);
     let matched = router.currentRoute.matched.filter(item => item.name);
     const first = matched[0];
-    if (first && first.path !== '') {
+    if (first && !first.indexRouter) {
       router.breadcrumbs = [indexRoute, ...matched];
     } else {
       router.breadcrumbs = [...matched];
@@ -2558,8 +2559,10 @@ define(['exports', 'vuex', '@/.lazybee'], function (exports, Vuex, options) { 'u
 
   // 获取首页路由
   function getIndexRoute(routes) {
-    let indexRoute = routes.find(route => route.path === '');
-    delete indexRoute.children;
+    let indexRoute = routes.find(route => route.indexRouter);
+    if (indexRoute.children) {
+      delete indexRoute.children;
+    }
     return indexRoute;
   }
 
@@ -2574,7 +2577,7 @@ define(['exports', 'vuex', '@/.lazybee'], function (exports, Vuex, options) { 'u
      * 路由前置钩子
      */
     router.beforeEach((to, from, next) => {
-      if (routes.length === 0) {
+      if (!isGet) {
         getRoutes(options.modules); // 获取模块的router.js
         /**
          * 过滤模块的路由配置，通常用于权限控制
@@ -2583,6 +2586,7 @@ define(['exports', 'vuex', '@/.lazybee'], function (exports, Vuex, options) { 'u
           routes = options.filter(routes);
         }
         router.addRoutes(routes);
+        isGet = true;
         next({ path: to.path, replace: true });
       }
 
@@ -2632,8 +2636,22 @@ define(['exports', 'vuex', '@/.lazybee'], function (exports, Vuex, options) { 'u
         getters = options.files(key).default;
         return;
       }
-      const path = key.slice(2, -3);
+      let path = key.slice(2, -3);
       const storeModule = options.files(key).default;
+
+      modules[path] = storeModule;
+    });
+
+    options.pages.keys().forEach(key => {
+      let path = key.slice(2, -3);
+
+      if (path === 'model') {
+        path = 'pages';
+      } else if (path.indexOf('model') !== -1) {
+        path = path.slice(0, path.indexOf('model') - 1);
+      }
+      const storeModule = options.pages(key).default;
+
       modules[path] = storeModule;
     });
 
@@ -4792,7 +4810,7 @@ define(['exports', 'vuex', '@/.lazybee'], function (exports, Vuex, options) { 'u
 
   const params = Object.assign(defaultOptions, options);
 
-  const server = new CreateService(params.httpConfig);
+  const request = new CreateService(params.httpConfig);
 
   var index = {
     install(Vue) {
@@ -4808,14 +4826,15 @@ define(['exports', 'vuex', '@/.lazybee'], function (exports, Vuex, options) { 'u
         breadcrumb: params.breadcrumb,
         scrollBehavior: params.scrollBehavior,
         routes: params.routes,
-        modules: require.context('@/views', true, /router\.js/),
+        modules: require.context('@/pages', true, /router\.js/),
         filter: params.filter,
         beforeEach: params.beforeEach,
         afterEach: params.afterEach
       });
 
       let store = new autoVuex({
-        files: require.context('@/store', true, /\.js$/)
+        files: require.context('@/models', true, /\.js$/),
+        pages: require.context('@/pages', true, /model\.js$/)
       });
 
       let i18n = new VueI18nStorge({
@@ -4826,14 +4845,13 @@ define(['exports', 'vuex', '@/.lazybee'], function (exports, Vuex, options) { 'u
       return {
         router,
         store,
-        server,
         i18n
       };
     }
   };
 
   exports.default = index;
-  exports.server = server;
+  exports.request = request;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

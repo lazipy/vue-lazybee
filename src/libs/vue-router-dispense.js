@@ -1,8 +1,9 @@
 import Router from '../vendors/vue-router'
 
 let routes = []
+let isGet = false
 // 获取所有模块的router.js
-function getRoutes(modules) {
+function getRoutes (modules) {
   if (modules) {
     modules.keys().forEach(route => {
       const routerModule = modules(route)
@@ -12,7 +13,7 @@ function getRoutes(modules) {
 }
 
 // 实例化vue-router
-function instantiation(options) {
+function instantiation (options) {
   return new Router({
     mode: options.mode,
     base: options.base,
@@ -22,7 +23,7 @@ function instantiation(options) {
 }
 
 // 添加访问历史记录
-function addVisiteRecord(router, to) {
+function addVisiteRecord (router, to) {
   if (router.records) {
     if (!router.records.map(v => v.path).includes(to.path)) {
       router.records = [...router.records, to]
@@ -33,12 +34,12 @@ function addVisiteRecord(router, to) {
 }
 
 // 添加面包屑信息
-function addBreadcrumb(routes, router) {
-  routes = [...routes, router.options.routes]
+function addBreadcrumb (routes, router) {
+  routes = [...routes, ...router.options.routes]
   const indexRoute = getIndexRoute(routes)
   let matched = router.currentRoute.matched.filter(item => item.name)
   const first = matched[0]
-  if (first && first.path !== '') {
+  if (first && !first.indexRouter) {
     router.breadcrumbs = [indexRoute, ...matched]
   } else {
     router.breadcrumbs = [...matched]
@@ -46,9 +47,11 @@ function addBreadcrumb(routes, router) {
 }
 
 // 获取首页路由
-function getIndexRoute(routes) {
-  let indexRoute = routes.find(route => route.path === '')
-  delete indexRoute.children
+function getIndexRoute (routes) {
+  let indexRoute = routes.find(route => route.indexRouter)
+  if (indexRoute.children) {
+    delete indexRoute.children
+  }
   return indexRoute
 }
 
@@ -56,14 +59,14 @@ function getIndexRoute(routes) {
  * vue-router-despense
  * @param {*} options
  */
-function VueRouterDespense(options) {
+function VueRouterDespense (options) {
   let router = instantiation(options) // 实例化vue-router
 
   /**
    * 路由前置钩子
    */
   router.beforeEach((to, from, next) => {
-    if (routes.length === 0) {
+    if (!isGet) {
       getRoutes(options.modules) // 获取模块的router.js
       /**
        * 过滤模块的路由配置，通常用于权限控制
@@ -72,6 +75,7 @@ function VueRouterDespense(options) {
         routes = options.filter(routes)
       }
       router.addRoutes(routes)
+      isGet = true
       next({ path: to.path, replace: true })
     }
 

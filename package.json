@@ -1,6 +1,6 @@
 {
   "name": "vue-lazybee",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Vue plugins to help you quickly build applications",
   "main": "dist/index.cjs.js",
   "scripts": {

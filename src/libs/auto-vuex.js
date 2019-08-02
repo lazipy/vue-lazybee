@@ -10,8 +10,22 @@ function autoVuex (options) {
       getters = options.files(key).default
       return
     }
-    const path = key.slice(2, -3)
+    let path = key.slice(2, -3)
     const storeModule = options.files(key).default
+
+    modules[path] = storeModule
+  })
+
+  options.pages.keys().forEach(key => {
+    let path = key.slice(2, -3)
+
+    if (path === 'model') {
+      path = 'pages'
+    } else if (path.indexOf('model') !== -1) {
+      path = path.slice(0, path.indexOf('model') - 1)
+    }
+    const storeModule = options.pages(key).default
+
     modules[path] = storeModule
   })
 
